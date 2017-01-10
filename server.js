@@ -1,10 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-var fileUpload = require('express-fileupload');
+// var fileUpload = require('express-fileupload');
 var s3 = require('s3');
+var client = require('./s3init.js');
+
 var multer = require('multer');
 var upload = multer({dest: './forupload/'})
-var client = require('./s3init.js');
+
 
 const app = express();
 
@@ -15,17 +17,18 @@ app.get('/', function (req, res, next) {
   res.send('Hello World - Spike File');
 });
 
-app.get('/demo', function (req, res, next) {
-  res.send('Watch the demo!');
-});
-
+// Node module: MULTER
 // This does upload the file from the HTTP request and puts it in the 'dest' folder
-// It gives it a hashed name, but req.files is still undefined
+// It gives it a hashed name. req.file gives us file details
+// Sent test request using postman - attached file in boy with key 'filename', no headers set explicitly
+// If not working correctly, try a new tab in postman with fresh request
 app.post('/multer', upload.single('filename'), function (req, res, next) {
-  console.log('req.files ', req.files);
+  console.log('req.file ', req.file);
 });
 
-// Couldn't get this to work - express-fileupload - low # downloads so ditching this module
+// Node module: express-fileupload
+// Low # downloads, so ditching this module
+//
 // app.post('/uploadfromrequest', function (req, res, next) {
 //   console.log('HELLO')
 //   console.log('req.files ', req.files);
@@ -56,9 +59,6 @@ app.get('/uploadlocal', function (req, res, next) {
   });
 // res.send('Upload route');
 });
-
-
-
 
 app.listen(process.env.PORT || 3000, function () {
   console.log('Listening port 3000');
