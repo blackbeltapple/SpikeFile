@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 // var fileUpload = require('express-fileupload');
 var s3 = require('s3');
 var client = require('./s3init.js');
+var apiRouter = require('./api.router')
 
 var multer = require('multer');
 var upload = multer({dest: './forupload/'})
@@ -55,25 +56,27 @@ app.get('/uploadlocal', function (req, res, next) {
   var params = {
     localFile: "forupload/benedict.jpg",
     s3Params: {
-      Bucket: "student-portal",
-      Key: "benedict7.jpg",
+      Bucket: "blackbeltapple",
+      Key: "wednesday0700xd.jpg",
       // other options supported by putObject, except Body and ContentLength.
       // See: http://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putObject-property
     },
   };
   var uploader = client.uploadFile(params);
   uploader.on('error', function(err) {
-  console.error("unable to upload:", err.stack);
+    console.error("Unable to upload. Error summary: ", err.statusCode, err.message);
+    console.log("Full error: ", err);
   });
   uploader.on('progress', function() {
-  console.log("progress", uploader.progressMd5Amount,
-            uploader.progressAmount, uploader.progressTotal);
+    // console.log("progress", uploader.progressMd5Amount, uploader.progressAmount, uploader.progressTotal);
   });
-  uploader.on('end', function() {
-  console.log("done uploading");
+  uploader.on('end', function(file) {
+    console.log("done uploading: ", file);
   });
 // res.send('Upload route');
 });
+
+app.use('/api', apiRouter);
 
 app.listen(process.env.PORT || 3000, function () {
   console.log('Listening port 3000');
